@@ -1,3 +1,2 @@
 streamlit
 requests
-   * Ve a [share.streamlit.io](https://share.streamlit.io/), inicia sesión con GitHub, haz clic en "New app" y selecciona tu repositorio y el archivo `app.py`. ¡En cuestión de segundos estará en vivo en internet!
