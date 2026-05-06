@@ -68,13 +68,14 @@ def create_card(data):
 </div>""".replace('\n', '')
 
     # Guardamos el HTML en una variable y lo retornamos sin saltos de línea
+    # Se ajusta el tamaño de la imagen a 250px para que resalte más en la tarjeta
     card_html = f"""<div style="background-color: white; border-radius: 20px; padding: 20px; width: 300px; border: 4px solid {color_theme}; font-family: 'Arial', sans-serif; color: #333; box-shadow: 0px 10px 20px rgba(0,0,0,0.2); margin: 0 auto;">
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <h2 style="margin: 0; color: {color_theme};">{name}</h2>
 <span style="background: #eee; padding: 2px 10px; border-radius: 20px; font-weight: bold;">#{id_}</span>
 </div>
 <div style="text-align: center; margin: 15px 0;">
-<img src="{sprite}" style="width: 250px; filter: drop-shadow(2px 4px 6px black);">
+<img src="{sprite}" style="width: 250px; max-width: 100%; height: auto; filter: drop-shadow(2px 4px 6px black);">
 </div>
 <div style="display: flex; justify-content: center; gap: 5px; margin-bottom: 20px;">
 {' '.join([f'<span style="background:{TYPE_COLORS.get(t, "#ccc")}; padding: 4px 12px; border-radius: 15px; font-size: 12px; color: white; text-transform: uppercase; font-weight: bold;">{t}</span>' for t in types])}
