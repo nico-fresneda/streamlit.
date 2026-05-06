@@ -75,7 +75,6 @@ def create_card(data):
 </div>
 <div style="text-align: center; margin: 15px 0;">
 <img src="{sprite}" style="width: 180px; filter: drop-shadow(2px 4px 6px black);">
-<img src="{sprite}" style="width: 250px; filter: drop-shadow(2px 4px 6px black);">
 </div>
 <div style="display: flex; justify-content: center; gap: 5px; margin-bottom: 20px;">
 {' '.join([f'<span style="background:{TYPE_COLORS.get(t, "#ccc")}; padding: 4px 12px; border-radius: 15px; font-size: 12px; color: white; text-transform: uppercase; font-weight: bold;">{t}</span>' for t in types])}
