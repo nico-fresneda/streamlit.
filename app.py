@@ -42,11 +42,17 @@ def fetch_pokemon(name):
 def create_card(data):
     name = data['name'].capitalize()
     id_ = data['id']
-    sprite = data['sprites']['front_default']
-
+    
+    # Intentamos obtener el Arte Oficial en Alta Resolución
+    sprite = data['sprites'].get('other', {}).get('official-artwork', {}).get('front_default')
+    
+    # Si no tiene arte oficial, volvemos al sprite por defecto
+    if not sprite:
+        sprite = data['sprites'].get('front_default')
+        
     if not sprite:
         sprite = "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
-
+        
     types = [t['type']['name'] for t in data['types']]
     color_theme = TYPE_COLORS.get(types[0], TYPE_COLORS['default'])
 
@@ -56,7 +62,7 @@ def create_card(data):
         val = s['base_stat']
         s_color = STAT_HEX_COLORS.get(s_name, '#777')
         width = min(100, (val / 150) * 100)
-        # Añadimos .replace('\n', '') al final para eliminar saltos de línea
+        # Sin espacios iniciales para evitar error de Markdown en Streamlit
         stats_html += f"""<div style='margin-bottom: 5px;'>
 <div style='display:flex; justify-content:space-between; font-size: 11px;'>
 <span>{s_name.upper()}</span>
@@ -67,14 +73,14 @@ def create_card(data):
 </div>
 </div>""".replace('\n', '')
 
-    # Guardamos el HTML en una variable y lo retornamos sin saltos de línea
+    # Se ajusta el tamaño de la imagen a 220px y se asegura de que encaje (object-fit)
     card_html = f"""<div style="background-color: white; border-radius: 20px; padding: 20px; width: 300px; border: 4px solid {color_theme}; font-family: 'Arial', sans-serif; color: #333; box-shadow: 0px 10px 20px rgba(0,0,0,0.2); margin: 0 auto;">
 <div style="display: flex; justify-content: space-between; align-items: center;">
 <h2 style="margin: 0; color: {color_theme};">{name}</h2>
 <span style="background: #eee; padding: 2px 10px; border-radius: 20px; font-weight: bold;">#{id_}</span>
 </div>
 <div style="text-align: center; margin: 15px 0;">
-<img src="{sprite}" style="width: 180px; filter: drop-shadow(2px 4px 6px black);">
+<img src="{sprite}" style="width: 220px; height: 220px; object-fit: contain; filter: drop-shadow(4px 6px 8px rgba(0,0,0,0.3));">
 </div>
 <div style="display: flex; justify-content: center; gap: 5px; margin-bottom: 20px;">
 {' '.join([f'<span style="background:{TYPE_COLORS.get(t, "#ccc")}; padding: 4px 12px; border-radius: 15px; font-size: 12px; color: white; text-transform: uppercase; font-weight: bold;">{t}</span>' for t in types])}
@@ -110,13 +116,13 @@ with st.form(key='search_form'):
 # --- BLOQUE 6: LÓGICA DE BÚSQUEDA ---
 if submit_button or nombre_busqueda:
     nombre = nombre_busqueda.strip().lower()
-
+    
     if not nombre:
         st.warning("⚠️ Por favor, ingresa un nombre o número válido.")
     else:
         with st.spinner(f"Buscando a {nombre.capitalize()}..."):
             data = fetch_pokemon(nombre)
-
+            
         if data:
             total_stats = sum(s['base_stat'] for s in data['stats'])
             cat_nombre, cat_color = obtener_categoria(total_stats)
@@ -126,16 +132,15 @@ if submit_button or nombre_busqueda:
                 st.session_state.historial_busqueda.insert(0, nombre_capitalizado)
 
             st.write("<br>", unsafe_allow_html=True)
-
-            # Añadimos .replace('\n', '') también aquí
+            
             category_card_html = f"""<div style="background-color: white; border-radius: 20px; padding: 15px; margin: 0 auto 20px auto; width: 300px; border: 4px solid {cat_color}; font-family: 'Arial', sans-serif; color: #333; box-shadow: 0px 10px 20px rgba(0,0,0,0.1); text-align: center;">
 <h3 style="margin: 0; color: {cat_color}; font-size: 18px;">Categoría: {cat_nombre}</h3>
 <p style="margin: 5px 0 0; font-weight: bold; font-size: 14px;">Total Puntos Base: {total_stats}</p>
 </div>""".replace('\n', '')
-
+            
             st.markdown(category_card_html, unsafe_allow_html=True)
             st.markdown(create_card(data), unsafe_allow_html=True)
-
+            
             st.write("<br>", unsafe_allow_html=True)
         else:
             st.error(f"❌ El Pokémon '{nombre}' no existe en la base de datos.")
